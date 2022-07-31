@@ -4,21 +4,19 @@
 //
 //Supporting the following project: https://www.instructables.com/Solar-Powered-WiFi-Weather-Station-V30/
 
-#define VERSION "1.3.2"
+//version 1.3.1
+#define VERSION "1.3.1"
 
 //=============================================
 // Changelog
 //=============================================
-/*
- *  v1.3.2
- *      1. I2C OLED diagnostics added (if needed)
- *      2. 
-    v1.3.1
-        1. Corrects missing quotes on #define VERSION statement
-        2. max retry if 15 connect attempts added and then we bail on WiFi connect. This prevents us from hitting the WDT limit and rebooting
-
-
-    v1.3 supports 24h rainfall data, not 23h
+/* 
+ *  v1.3.1
+ *      1. Corrects missing quotes on #define VERSION statement
+ *      2. max retry if 15 connect attempts added and then we bail on WiFi connect. This prevents us from hitting the WDT limit and rebooting
+ *  
+ *  
+ *  v1.3 supports 24h rainfall data, not 23h
         supports current 60 min rainfall, not
         current "hour" that looses data at top
         of the hour.
@@ -72,12 +70,6 @@
 #include <esp_task_wdt.h>
 #include <esp_system.h>
 #include <driver/rtc_io.h>
-//OLED diagnostics board
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-
-#define OLED_RESET 4
-Adafruit_SSD1306 display(OLED_RESET);
 
 //===========================================
 // Defines
@@ -186,87 +178,6 @@ long rssi = 0;
 void IRAM_ATTR rainTick(void);
 void IRAM_ATTR windTick(void);
 
-//===========================================
-// setup:
-//===========================================
-void setup()
-{
-  long UpdateIntervalModified = 0;
-
-  setCpuFrequencyMhz (80);
-  rtc_gpio_init(GPIO_NUM_12);
-  rtc_gpio_set_direction(GPIO_NUM_12, RTC_GPIO_MODE_OUTPUT_ONLY);
-  rtc_gpio_set_level(GPIO_NUM_12, 1);
-
-  esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
-  esp_task_wdt_add(NULL); //add current thread to WDT watch
-
-  //set hardware pins
-  pinMode(WIND_SPD_PIN, INPUT);
-  pinMode(RAIN_PIN, INPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
-  Serial.begin(115200);
-  delay(25);
-
-
-
-
-  //Title message
-  MonPrintf("\nWeather station - Deep sleep version.\n");
-  MonPrintf("Version %s\n\n", VERSION);
-  BlinkLED(1);
-  bootCount++;
-
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64)
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
-  printLocalTimeLCD();
-  printADCLCD();
-  display.printf("SSID: %s\n", ssid);
-  display.print("BOOT: ");
-  display.println(bootCount);
-  display.display();
-
-  updateWake();
-  wakeup_reason();
-  if (WiFiEnable)
-  {
-    rssi = wifi_connect();
-    if (rssi != RSSI_INVALID)
-    {
-      sensorEnable();
-      sensorStatusToConsole();
-      //Calibrate Clock - My ESP RTC is noticibly fast
-      configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-      printLocalTime();
-      printTimeNextWake();
-      processSensorUpdates();
-      WiFi.disconnect();
-      esp_wifi_stop();
-    }
-  }
-
-  UpdateIntervalModified = nextUpdate - mktime(&timeinfo);
-  if (UpdateIntervalModified < 3)
-  {
-    UpdateIntervalModified = 3;
-  }
-  //pet the dog!
-  esp_task_wdt_reset();
-  BlinkLED(2);
-  sleepyTime(UpdateIntervalModified);
-}
-
-//===================================================
-// loop: these are not the droids you are looking for
-//===================================================
-void loop()
-{
-  //no loop code
-}
-
 //====================================================
 // processSensorUpdates: Connect to WiFi, read sensors
 // and record sensors at IOT destination and MQTT
@@ -301,9 +212,6 @@ void processSensorUpdates(void)
   {
     SendDataMQTT(&environment);
   }
-  display.printf("Temp: %4.1f F\n", environment.temperatureF);
-  display.printf("Pressure: %4.1f inHg\n", environment.barometricPressure);
-  display.display();
 }
 
 //===========================================================
@@ -396,7 +304,7 @@ void BlinkLED(int count)
     delay(150);
     //LED OFF
     digitalWrite(LED_BUILTIN, LOW);
-    delay(350);
+    delay(500);
   }
 }
 
@@ -425,3 +333,71 @@ void sensorStatusToConsole(void)
   MonPrintf("lightMeter status:  %i\n", status.lightMeter);
   MonPrintf("temperature status: %i\n\n", status.temperature);
 }
+
+
+//===========================================
+// setup:
+//===========================================
+void setup()
+{
+  long UpdateIntervalModified = 0;
+
+  setCpuFrequencyMhz (80);
+  rtc_gpio_init(GPIO_NUM_12);
+  rtc_gpio_set_direction(GPIO_NUM_12, RTC_GPIO_MODE_OUTPUT_ONLY);
+  rtc_gpio_set_level(GPIO_NUM_12, 1);
+
+  esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
+  esp_task_wdt_add(NULL); //add current thread to WDT watch
+
+  //set hardware pins
+  pinMode(WIND_SPD_PIN, INPUT);
+  pinMode(RAIN_PIN, INPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+  Serial.begin(115200);
+  delay(25);
+
+  //Title message
+  MonPrintf("\nWeather station - Deep sleep version.\n");
+  MonPrintf("Version %s\n\n", VERSION);
+  BlinkLED(1);
+  bootCount++;
+
+  updateWake();
+  wakeup_reason();
+  if (WiFiEnable)
+  {
+    rssi = wifi_connect();
+    if (rssi != RSSI_INVALID)
+    {
+      sensorEnable();
+      sensorStatusToConsole();
+      //Calibrate Clock - My ESP RTC is noticibly fast
+      configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+      printLocalTime();
+      printTimeNextWake();
+    processSensorUpdates();
+      WiFi.disconnect();
+      esp_wifi_stop();
+    }
+  }
+
+  UpdateIntervalModified = nextUpdate - mktime(&timeinfo);
+  if (UpdateIntervalModified < 3)
+  {
+    UpdateIntervalModified = 3;
+  }
+  //pet the dog!
+  esp_task_wdt_reset();
+  sleepyTime(UpdateIntervalModified);
+}
+
+//===================================================
+// loop: these are not the droids you are looking for
+//===================================================
+void loop()
+{
+  //no loop code
+}
+
