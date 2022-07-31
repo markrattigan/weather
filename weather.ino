@@ -82,7 +82,7 @@
 #define PR_PIN       15  //photoresistor pin 
 #define VOLT_PIN     33  //voltage divider for battery monitor
 #define TEMP_PIN      4  // DS18B20 hooked up to GPIO pin 4
-#define LED_BUILTIN   2  //Diagnostics using built-in LED, may be set to 12 for newer boards that do not use devkit sockets
+//#define LED_BUILTIN   2  //Diagnostics using built-in LED, may be set to 12 for newer boards that do not use devkit sockets
 #define SEC 1E6          //Multiplier for uS based math
 #define WDT_TIMEOUT 60   //watchdog timer
 

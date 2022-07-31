@@ -60,7 +60,8 @@ void sendData(struct sensorData *environment)
 
       postStr += "&field4=";
 #ifdef METRIC
-      postStr += String(environment->temperatureC);
+      //postStr += String(environment->temperatureC);
+      postStr += String(environment->BMEtemperature);      
 #else
       postStr += String(environment->temperatureF);
 #endif
@@ -85,6 +86,7 @@ void sendData(struct sensorData *environment)
       postStr += " HTTP/1.1\r\nHost: a.c.d\r\nConnection: close\r\n\r\n";
       postStr += "";
       client.print(postStr);
+      //MonPrintf(postStr);
       MonPrintf("Thingspeak output: %s\n", postStr);
       delay(5000);
     }

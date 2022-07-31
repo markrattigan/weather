@@ -127,9 +127,9 @@ void readBME(struct sensorData *environment)
 #ifndef METRIC
     bme.read(environment->barometricPressure, environment->BMEtemperature, environment->humidity, BME280::TempUnit_Fahrenheit, BME280::PresUnit_inHg);
 #else
-    bme.read(environment->barometricPressure, environment->BMEtemperature, environment->humidity, BME280::TempUnit_Celsius, BME280::PresUnit_Pa);
+    bme.read(environment->barometricPressure, environment->BMEtemperature, environment->humidity, BME280::TempUnit_Celsius, BME280::PresUnit_hPa);
+      environment->barometricPressure += 57.7; //environment->barometricPressure += ALTITUDE_OFFSET_METRIC;
 #endif
-
   }
   else
   {
