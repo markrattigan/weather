@@ -70,14 +70,6 @@
 #include <esp_task_wdt.h>
 #include <esp_system.h>
 #include <driver/rtc_io.h>
-  //includes for SSD1306
-#ifdef SSD1306Enable
-#include <SPI.h>
-//#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#endif
-
 
 //===========================================
 // Defines
@@ -103,15 +95,6 @@
 #define TEMP_PIN            15  // DS18B20 hooked up to GPIO pin 15
 #define LED_PIN             14  //Diagnostics using built-in LED
 //#define MODE_PIN          12  //Load Switch
-#endif
-
-  //ssd1306 defines
-#ifdef SSD1306Enable
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
-#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x3C //despite what is written on the OLED board
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #endif
 
 //===========================================

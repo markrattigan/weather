@@ -73,16 +73,6 @@ void checkBatteryVoltage (void)
   int adc;
   float voltage;
   adc = analogRead(VOLT_PIN);
-#IFDEF SSD1306Enable
-  delay(2000);
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
-  display.setCursor(0, 10);
-  // Display static text
-  display.println("ADC Voltage:", adc);
-  display.display();
-#ENDIF
   voltage = adc * batteryCalFactor;
   //MonPrintf("Battery digital ADC :%i voltage: %6.2f\n", environment->batteryADC, environment->batteryVoltage);
   //check for low battery situation
