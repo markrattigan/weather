@@ -72,10 +72,12 @@ void sendData(struct sensorData *environment)
       postStr += String(environment->windDirection);
       postStr += "&field7=";
 #ifdef METRIC
-      postStr += String(rainfall.hourlyRainfall[hourPtr] * 0.011 * 25.4);
+      //postStr += String(rainfall.hourlyRainfall[hourPtr] * 0.011 * 25.4);
 #else
-      postStr += String(rainfall.hourlyRainfall[hourPtr] * 0.011);
+      //postStr += String(rainfall.hourlyRainfall[hourPtr] * 0.011);
 #endif
+      //using field 7 for Lux
+      postStr += String(environment->lux)
       postStr += "&field8=";
 #ifdef METRIC
       postStr += String(last24() * 0.011 * 25.4);

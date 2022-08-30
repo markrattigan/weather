@@ -55,7 +55,7 @@ void readBattery (struct sensorData *environment)
   environment->batteryVoltage = environment->batteryADC * batteryCalFactor;
   MonPrintf("Battery digital ADC :%i voltage: %6.2f\n", environment->batteryADC, environment->batteryVoltage);
   //check for low battery situation
-  if (environment->batteryVoltage < 3.78)
+  if (environment->batteryVoltage < 3.5)
   {
     lowBattery = true;
   }
@@ -76,7 +76,7 @@ void checkBatteryVoltage (void)
   voltage = adc * batteryCalFactor;
   //MonPrintf("Battery digital ADC :%i voltage: %6.2f\n", environment->batteryADC, environment->batteryVoltage);
   //check for low battery situation
-  if (voltage < 3.78)
+  if (voltage < 3.5)
   {
     lowBattery = true;
   }
